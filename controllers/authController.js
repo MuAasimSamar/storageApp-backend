@@ -67,7 +67,8 @@ export const loginWithGoogle = async (req, res, next) => {
     res.cookie("sid", sessionId, {
       httpOnly: true,
       signed: true,
-      sameSite: "lax",
+      sameSite: "none",
+      secure: true,
       maxAge: sessionExpiryTime,
     });
 
@@ -118,7 +119,8 @@ export const loginWithGoogle = async (req, res, next) => {
     res.cookie("sid", sessionId, {
       httpOnly: true,
       signed: true,
-      sameSite: "lax",
+      sameSite: "none",
+      secure: true,
       maxAge: sessionExpiryTime,
     });
 

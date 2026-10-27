@@ -29,21 +29,16 @@ export const getFile = async (req, res) => {
     return res.status(404).json({ error: "File not found!" });
   }
 
-  if (req.query.action === "download") {
-    const fileUrl = await createGetSignedUrl({
-      key: `${id}${fileData.extension}`,
-      download: true,
-      filename: fileData.name,
-    });
-
-    return res.redirect(fileUrl);
-  }
-
-  // Send file
+  const isDownload = req.query.action === "download";
   const fileUrl = await createGetSignedUrl({
     key: `${id}${fileData.extension}`,
+    download: isDownload,
     filename: fileData.name,
   });
+
+  if (req.query.json === "true" || req.headers.accept?.includes("application/json")) {
+    return res.json({ url: fileUrl, filename: fileData.name });
+  }
 
   return res.redirect(fileUrl);
 };
