@@ -1,7 +1,6 @@
 import Directory from "../models/directoryModel.js";
 import User from "../models/userModel.js";
 import mongoose, { Types } from "mongoose";
-import Session from "../models/sessionModel.js";
 import File from "../models/fileModel.js";
 import OTP from "../models/otpModel.js";
 import redisClient from "../config/redis.js";

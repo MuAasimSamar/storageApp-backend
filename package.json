@@ -4,7 +4,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=.env --no-deprecation app.js"
+    "dev": "node --watch --env-file=.env --no-deprecation app.js",
+    "start": "node --env-file=.env --no-deprecation app.js"
   },
   "keywords": [],
   "author": "",
