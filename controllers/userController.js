@@ -1,6 +1,7 @@
 import Directory from "../models/directoryModel.js";
 import User from "../models/userModel.js";
 import mongoose, { Types } from "mongoose";
+import Session from "../models/sessionModel.js";
 import File from "../models/fileModel.js";
 import OTP from "../models/otpModel.js";
 import redisClient from "../config/redis.js";
@@ -129,7 +130,8 @@ export const login = async (req, res, next) => {
   res.cookie("sid", sessionId, {
     httpOnly: true,
     signed: true,
-    sameSite: "lax",
+    sameSite: "none",
+    secure: true,
     maxAge: sessionExpiryTime,
   });
   res.json({ message: "logged in" });
@@ -218,7 +220,9 @@ export const logoutById = async (req, res, next) => {
     }
     // Only the Owner can terminate another Owner's session
     if (targetUser.role === "Owner" && req.user.role !== "Owner") {
-      return res.status(403).json({ error: "Cannot terminate Owner's session." });
+      return res
+        .status(403)
+        .json({ error: "Cannot terminate Owner's session." });
     }
 
     const allSessions = await redisClient.ft.search(
@@ -272,12 +276,19 @@ export const deleteUser = async (req, res, next) => {
 
     // Owner cannot be deleted
     if (targetUser.role === "Owner") {
-      return res.status(403).json({ error: "The Owner account cannot be deleted." });
+      return res
+        .status(403)
+        .json({ error: "The Owner account cannot be deleted." });
     }
 
     // Admins cannot delete other Admins or Owner
-    if (req.user.role === "Admin" && (targetUser.role === "Admin" || targetUser.role === "Owner")) {
-      return res.status(403).json({ error: "Admins cannot delete other Admins." });
+    if (
+      req.user.role === "Admin" &&
+      (targetUser.role === "Admin" || targetUser.role === "Owner")
+    ) {
+      return res
+        .status(403)
+        .json({ error: "Admins cannot delete other Admins." });
     }
 
     const allSessions = await redisClient.ft.search(
@@ -308,7 +319,9 @@ export const updateUserRole = async (req, res, next) => {
 
   // Nobody can assign the "Owner" role
   if (role === "Owner") {
-    return res.status(403).json({ error: "Cannot assign Owner role. There is only one Owner." });
+    return res
+      .status(403)
+      .json({ error: "Cannot assign Owner role. There is only one Owner." });
   }
 
   try {
@@ -332,16 +345,22 @@ export const updateUserRole = async (req, res, next) => {
     } else if (callerRole === "Admin") {
       // Admin cannot change another Admin's role or Owner's role
       if (targetUser.role === "Admin" || targetUser.role === "Owner") {
-        return res.status(403).json({ error: "Admins cannot modify Admin or Owner roles." });
+        return res
+          .status(403)
+          .json({ error: "Admins cannot modify Admin or Owner roles." });
       }
       // Admin can only assign Manager or User
       const allowedRolesForAdmin = ["Manager", "User"];
       if (!allowedRolesForAdmin.includes(role)) {
-        return res.status(403).json({ error: "Admins can only assign Manager or User roles." });
+        return res
+          .status(403)
+          .json({ error: "Admins can only assign Manager or User roles." });
       }
     } else {
       // Managers and regular users cannot change roles
-      return res.status(403).json({ error: "You do not have permission to change user roles." });
+      return res
+        .status(403)
+        .json({ error: "You do not have permission to change user roles." });
     }
 
     // Update in MongoDB
