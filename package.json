@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --env-file=.env --no-deprecation app.js",
-    "start": "node --env-file=.env --no-deprecation app.js",
+    "start": "node  --no-deprecation app.js",
     "build": "node build.js"
   },
   "keywords": [],
