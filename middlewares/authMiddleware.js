@@ -1,0 +1,25 @@
+import redisClient from "../config/redis.js";
+
+export default async function checkAuth(req, res, next) {
+  const { sid } = req.signedCookies;
+
+  if (!sid) {
+    res.clearCookie("sid");
+    return res.status(401).json({ error: "1 Not logged in!" });
+  }
+
+  const session = await redisClient.json.get(`session:${sid}`);
+
+  if (!session) {
+    res.clearCookie("sid");
+    return res.status(401).json({ error: "2 Not logged in!" });
+  }
+
+  req.user = {
+    _id: session.userId,
+    rootDirId: session.rootDirId,
+    role: session.role || "User",
+    name: session.name || "",
+  };
+  next();
+}
