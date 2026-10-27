@@ -160,7 +160,10 @@ export const uploadInitiate = async (req, res) => {
 
     res.json({ uploadSignedUrl, fileId: insertedFile._id });
   } catch (err) {
-    console.log(err);
+    console.error("Initiate file upload error:", err);
+    return res
+      .status(500)
+      .json({ error: err.message || "Failed to initiate file upload" });
   }
 };
 
